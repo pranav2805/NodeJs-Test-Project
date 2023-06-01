@@ -15,6 +15,9 @@ exports.postCandy = async (req, res, next) => {
         const description = req.body.description;
         const price = req.body.price;
         const quantity = req.body.quantity;
+        if(quantity<0){
+            throw Error("Quantity is less than 0!!");
+        }
         const candy = await Candy.create({name: name, description: description, price: price, quantity: quantity});
         res.status(200).json(candy);
     } catch(err) {
@@ -22,8 +25,12 @@ exports.postCandy = async (req, res, next) => {
     }
 }
 
-exports.putBuyOne = async (req, res, next) => {
+exports.putUpdateQuantity = async (req, res, next) => {
     try {
+        const quantity = req.body.quantity;
+        if(quantity<0){
+            throw Error("Quantity is less than 0!!");
+        }
         const candy = await Candy.update(req.body, {where: {id: req.params.id}});
         res.status(200).json(candy);
     } catch(err) {

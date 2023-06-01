@@ -19,11 +19,6 @@ window.addEventListener('DOMContentLoaded', () => {
         .catch(err => {
             console.log(err);
         })
-    
-    nameInput.value = '';
-    descInput.value = '';
-    priceInput.value = '';
-    quantityInput.value = '';
 })
 
 function addItem(e) {
@@ -37,79 +32,91 @@ function addItem(e) {
 
     axios.post('http://localhost:4000/candies', obj)
         .then(response => {
+            //console.log(response);
             showCandyOnScreen(response.data);
         })
         .catch(err => {
             console.log(err);
         })
+    
+    nameInput.value = '';
+    descInput.value = '';
+    priceInput.value = '';
+    quantityInput.value = '';
 }
 
 function showCandyOnScreen(obj) {
     const parentElement = document.getElementById('items');
-    const childHTML = `<li id=${obj.id}> ${obj.name} ${obj.description} ${obj.price} ${obj.quantity}
-                          <button onclick="buyOne('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}')">Buy 1</button>
-                          <button onclick="buyTwo('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}')">Buy 2</button>
-                          <button onclick="buyThree('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}')">Buy 3</button>
-                       </li>`
+    const childHTML = `<li id=${obj.id} class="list-group-item"> 
+                                <div class="row">
+                                <div class="col-lg-3">
+                                    ${obj.name} 
+                                </div>
+                                <div class="col-lg-3">
+                                    ${obj.description} 
+                                </div>
+                                <div class="col-lg-3">
+                                    ${obj.price} 
+                                </div>
+                                <div class="col-lg-3">
+                                    ${obj.quantity} 
+                                </div>
+                                </div>
+                                <button class="btn btn-danger btn-sm float-right ml-2" onclick="updateQuantity('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}', 'buyOne')">Buy 1</button>
+                                <button class="btn btn-danger btn-sm float-right ml-2" onclick="updateQuantity('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}', 'buyTwo')">Buy 2</button>
+                                <button class="btn btn-danger btn-sm float-right ml-2" onclick="updateQuantity('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}', 'buyThree')">Buy 3</button>
+                        </li>`
+                    //    ${obj.description} ${obj.price} ${obj.quantity}
     parentElement.innerHTML = parentElement.innerHTML + childHTML;
 }
 
-function buyOne(id, name, description, price, quantity) {
+function updateQuantity(id, name, description, price, quantity, flag){
+    let newQuantity;
+    if(flag === 'buyOne') {newQuantity = quantity-1}
+    else if(flag === 'buyTwo') {newQuantity = quantity-2}
+    else if(flag === 'buyThree') {newQuantity = quantity-3}
     let my_obj = {
         name: name,
         description: description,
         price: price,
-        quantity: quantity - 1
+        quantity: newQuantity
     }
+    //console.log(my_obj.quantity);
     axios.put('http://localhost:4000/candies/buy-candy/'+id, my_obj)
         .then(response => {
             updateExistingCandy({...my_obj, id: id});
         })
         .catch(err => {
+            alert('Quantity is less than 0!');
             console.log(err);
         })
-}
-
-function buyTwo(id, name, description, price, qty) {
-    let my_obj = {
-        name: name,
-        description: description,
-        price: price,
-        quantity: qty - 1
-    }
-    axios.put('http://localhost:4000/candies/buy-candy/'+id, my_obj)
-        .then(response => {
-            updateExistingCandy({...my_obj, id: id});
-        })
-        .catch(err => {
-            console.log(err);
-        })
-}
-
-function buyThree(id, name, description, price, qty) {
-    console.log(qty);
-    let my_obj = {
-        name: name,
-        description: description,
-        price: price,
-        quantity: qty - 1
-    }
-    console.log(my_obj.quantity);
-    axios.put('http://localhost:4000/candies/buy-candy/'+id, my_obj)
-        .then(response => {
-            updateExistingCandy({...my_obj, id: id});
-        })
-        .catch(err => {
-            console.log(err);
-        })
-}
+} 
 
 function updateExistingCandy(obj) {
     //console.log('werty');
     const element = document.getElementById(obj.id);
-    element.innerHTML = `<li id=${obj.id}> ${obj.name} ${obj.description} ${obj.price} ${obj.quantity}
-                        <button onclick="buyOne('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}')">Buy 1</button>
-                        <button onclick="buyTwo('${obj.id}')">Buy 2</button>
-                        <button onclick="buyThree('${obj.id}')">Buy 3</button>
-                        </li>`;
+    // element.innerHTML = `<li id=${obj.id}> ${obj.name} ${obj.description} ${obj.price} ${obj.quantity}
+    //                     <button onclick="buyOne('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}')">Buy 1</button>
+    //                     <button onclick="buyTwo('${obj.id}')">Buy 2</button>
+    //                     <button onclick="buyThree('${obj.id}')">Buy 3</button>
+    //                     </li>`;
+
+    element.innerHTML = `<div class="row">
+                            <div class="col-lg-3">
+                                ${obj.name} 
+                            </div>
+                            <div class="col-lg-3">
+                                ${obj.description} 
+                            </div>
+                            <div class="col-lg-3">
+                                ${obj.price} 
+                            </div>
+                            <div class="col-lg-3">
+                                ${obj.quantity} 
+                            </div>
+                            </div>
+                            <button class="btn btn-danger btn-sm float-right ml-2" onclick="updateQuantity('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}', 'buyOne')">Buy 1</button>
+                            <button class="btn btn-danger btn-sm float-right ml-2" onclick="updateQuantity('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}', 'buyTwo')">Buy 2</button>
+                            <button class="btn btn-danger btn-sm float-right ml-2" onclick="updateQuantity('${obj.id}', '${obj.name}', '${obj.description}', '${obj.price}', '${obj.quantity}', 'buyThree')">Buy 3</button>
+                        `
 }
